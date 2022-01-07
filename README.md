@@ -16,6 +16,7 @@ Acquiring API Docs: https://oplata.tinkoff.ru/develop/api/payments/
   - [Get payment state](#get-payment-state)
   - [Resend notifications](#resend-notifications)
   - [Confirm two-step payment](#confirm-two-step-payment)
+  - [Charge recurrent payment](#charge-recurrent-payment)
   - [Helper functions](#helper-functions)
 - [References](#references)
 - [Contribution](#contribution)
@@ -131,6 +132,16 @@ res, err := c.Resend()
 fmt.Println("resend scheduled for %d notifications", res.Count)
 ```
 
+#### Charge recurrent payment
+[Charge recurrent payment](https://www.tinkoff.ru/kassa/develop/api/autopayments/charge-description/)
+```go
+res, err := client.Charge(&tinkoff.ChargeRequest{PaymentID: "3294", RebillID: "3219"})
+// ...
+if res.Status == tinkoff.StatusConfirmed {
+    fmt.Println("payment completed")
+}
+```
+
 #### Helper functions
 `client.PostRequest` allows you to implement API requests which are not implemented in this package yet (e.g. when Tinkoff Bank adds new method to API).
 Use BaseRequest type to implement any API request:
@@ -157,7 +168,6 @@ More useful links:
 All contributions are welcome! There are plenty of API methods that are not implemented yet due to their rare use-cases:
 - FinishAuthorize
 - Submit3DSAuthorization
-- Charge
 - AddCustomer / GetCustomer / RemoveCustomer
 - GetCardList / RemoveCard 
  
