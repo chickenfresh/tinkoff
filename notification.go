@@ -10,16 +10,16 @@ import (
 )
 
 type Notification struct {
-	TerminalKey    string            `json:"TerminalKey"` // Идентификатор магазина
-	OrderID        string            `json:"OrderId"`     // Номер заказа в системе Продавца
-	Success        bool              `json:"Success"`     // Успешность операции
-	Status         string            `json:"Status"`      // Статус платежа (см. описание статусов операций)
-	PaymentID      uint64            `json:"PaymentId"`   // Уникальный идентификатор платежа. В случае нотификаций банк присылает число, а не строку, как в случае с Init или Cancel
-	ErrorCode      string            `json:"ErrorCode"`   // Код ошибки, если произошла ошибка
-	Amount         uint64            `json:"Amount"`      // Текущая сумма транзакции в копейках
-	RebillID       string            `json:"RebillId"`    // Идентификатор рекуррентного платежа
-	CardID         uint64            `json:"CardId"`      // Идентификатор привязанной карты
-	PAN            string            `json:"Pan"`         // Маскированный номер карты
+	TerminalKey    string            `json:"TerminalKey"`     // Идентификатор магазина
+	OrderID        string            `json:"OrderId"`         // Номер заказа в системе Продавца
+	Success        bool              `json:"Success"`         // Успешность операции
+	Status         string            `json:"Status"`          // Статус платежа (см. описание статусов операций)
+	PaymentID      uint64            `json:"PaymentId"`       // Уникальный идентификатор платежа. В случае нотификаций банк присылает число, а не строку, как в случае с Init или Cancel
+	ErrorCode      string            `json:"ErrorCode"`       // Код ошибки, если произошла ошибка
+	Amount         uint64            `json:"Amount"`          // Текущая сумма транзакции в копейках
+	RebillID       string            `json:"RebillId,string"` // Идентификатор рекуррентного платежа
+	CardID         uint64            `json:"CardId"`          // Идентификатор привязанной карты
+	PAN            string            `json:"Pan"`             // Маскированный номер карты
 	DataStr        string            `json:"DATA"`
 	Data           map[string]string `json:"-"`       // Дополнительные параметры платежа, переданные при создании заказа
 	Token          string            `json:"Token"`   // Подпись запроса
