@@ -1,3 +1,3 @@
-module github.com/nikita-vanyasin/tinkoff
+module github.com/chickenfresh/tinkoff
 
-go 1.13
+go 1.16
