@@ -5,7 +5,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/nikita-vanyasin/tinkoff"
+	"github.com/chickenfresh/tinkoff"
 )
 
 func TestCallsChain(t *testing.T) {
