@@ -20,10 +20,17 @@ type Notification struct {
 	RebillID       uint64            `json:"RebillId"`    // Идентификатор рекуррентного платежа
 	CardID         uint64            `json:"CardId"`      // Идентификатор привязанной карты
 	PAN            string            `json:"Pan"`         // Маскированный номер карты
-	DataStr        string            `json:"DATA"`
-	Data           map[string]string `json:"-"`       // Дополнительные параметры платежа, переданные при создании заказа
-	Token          string            `json:"Token"`   // Подпись запроса
-	ExpirationDate string            `json:"ExpDate"` // Срок действия карты
+	Data           map[string]string `json:"-"`           // Дополнительные параметры платежа, переданные при создании заказа
+	Token          string            `json:"Token"`       // Подпись запроса
+	ExpirationDate string            `json:"ExpDate"`     // Срок действия карты
+}
+
+type NotificationV1 struct {
+	DataStr string `json:"DATA"`
+}
+
+type NotificationV2 struct {
+	Data map[string]string `json:"data"` // Дополнительные параметры платежа, переданные при создании заказа
 }
 
 func (n *Notification) GetValuesForToken() map[string]string {
@@ -43,8 +50,11 @@ func (n *Notification) GetValuesForToken() map[string]string {
 		result["CardId"] = strconv.FormatUint(n.CardID, 10)
 	}
 
-	if n.DataStr != "" {
-		result["DATA"] = n.DataStr
+	if n.Data != nil {
+		data, err := json.Marshal(n.Data)
+		if err == nil {
+			result["DATA"] = string(data)
+		}
 	}
 
 	if n.RebillID != 0 {
@@ -65,6 +75,22 @@ func (c *Client) ParseNotification(requestBody io.Reader) (*Notification, error)
 		return nil, err
 	}
 
+	var dataV1 NotificationV1
+	err = json.Unmarshal(bytes, &dataV1)
+	if err != nil {
+		var dataV2 NotificationV2
+		err = json.Unmarshal(bytes, &dataV1)
+		if err != nil {
+			return nil, err
+		}
+		notification.Data = dataV2.Data
+	} else if dataV1.DataStr != "" {
+		err = json.Unmarshal([]byte(dataV1.DataStr), &notification.Data)
+		if err != nil {
+			return nil, errors.New("can't unserialize DATA field: " + err.Error())
+		}
+	}
+
 	if c.terminalKey != notification.TerminalKey {
 		return nil, errors.New("invalid terminal key")
 	}
@@ -75,13 +101,6 @@ func (c *Client) ParseNotification(requestBody io.Reader) (*Notification, error)
 	if token != notification.Token {
 		valsForTokenJSON, _ := json.Marshal(valuesForTokenGen)
 		return nil, fmt.Errorf("invalid token: expected %s got %s.\nValues for token: %s.\nNotification: %s", token, notification.Token, valsForTokenJSON, string(bytes))
-	}
-
-	if notification.DataStr != "" {
-		err = json.Unmarshal([]byte(notification.DataStr), &notification.Data)
-		if err != nil {
-			return nil, errors.New("can't unserialize DATA field: " + err.Error())
-		}
 	}
 
 	return &notification, nil
